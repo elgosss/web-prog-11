@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Задание 1</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+        <style>
+            table {
+                border-collapse: collapse;
+                border: 3px solid black;
+                font-size: 16px;
+                text-align: center;
+                table-layout: fixed;
+                width: 1400px;
+                font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+            }
+            td {
+                border: 1px solid black;
+                padding: 10px;
+            }
+            th {
+                background-color: #AFCDE7;
+                border: 1px solid black;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="main">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Флаг страны</th>
+                        <th>Название страны</th>
+                        <th>Название валюты по-английски</th>
+                        <th>Название валюты по-белорусски</th>
+                        <th>Официальный курс белорусского рубля по отношению к иностранной валюте</th>
+                    </tr>
+                </thead>
+                <tbody id="table">
+                    <tr>
+                        <td><img src='China.png' height="58px" margin="50px auto"></td>
+                        <td>Китай</td>
+                        <td id="curEng"></td>
+                        <td id="curBel"></td>
+                        <td id="course"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <script>
+                "use strict";
+                // https://api.nbrb.by/exrates/currencies/462
+                const listCur = new XMLHttpRequest();
+                listCur.open("GET", "https://api.nbrb.by/exrates/currencies/462", false);
+                listCur.send();
+
+                $('#curEng').html(JSON.parse(listCur.responseText)['Cur_Name_Eng']);
+                $('#curBel').html(JSON.parse(listCur.responseText)['Cur_Name_Bel']);
+
+                const listCourse = new XMLHttpRequest();
+                listCourse.open("GET", "https://api.nbrb.by/exrates/rates/462", false);
+                listCourse.send();
+
+                $('#course').html(JSON.parse(listCourse.responseText)['Cur_OfficialRate'] / JSON.parse(listCourse.responseText)['Cur_Scale']);
+            </script>
+        </div>
+    </body>
+</html>
