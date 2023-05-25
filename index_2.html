@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Задание 2</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+        <style>
+            #main {
+                margin-left: auto;
+                margin-right: auto;
+                width: 800px;
+            }
+
+            label {
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+                font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+                font-size: 18px;
+                
+                margin-bottom: 20px;
+            }
+
+            #l_start {
+                width: 370px;
+            }
+
+            #l_end {
+                width: 400px;
+            }
+
+            input {
+                font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+                font-size: 18px;
+            }
+            
+            button {
+                font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+                margin-bottom: 20px;
+                color: #206cb3;
+                cursor: pointer;
+                font-size: 18px;
+                height: 40px;
+                border: 0;
+                border-radius: 20px;
+                background: #E1E3E0;
+            }
+
+            #calendar {
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            table {
+                font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+                text-align: center;
+                border-collapse: collapse;
+                background: #E1E3E0;
+                margin: 50px auto;
+                margin-top: 0;
+                border: 3px solid #206cb3;
+                width: 400px;
+            }
+
+            th {
+                font-size: 18px;
+                font-weight: 300;
+                padding: 12px 10px;
+                color: #206cb3;
+                border: 1px solid #206cb3;
+            }
+
+            td {
+                font-size: 18px;
+                padding: 10px;
+                border: 1px solid #206cb3;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="main">
+            <label id="l_start">Дата начала периода: <input type="date" id="start"></label>
+            <label id="l_end">Дата окончания периода: <input type="date" id="end"></label>
+            <button>Отобразить динамику курса</button>
+            <div id="tableCourse"></div>
+        </div>
+        <script>
+            "use strict";
+            $('button').on('click', function() {
+
+                var start = new Date($('#start').val());
+                var startDate = String(start.getFullYear()) + '-' + (start.getMonth() + 1 < 10 ? '0' : '') + String(start.getMonth() + 1) + '-' + (start.getDate() < 10 ? '0' : '') + String(start.getDate());
+                
+                var end = new Date($('#end').val());
+                var endDate = String(end.getFullYear()) + '-' + (end.getMonth() + 1 < 10 ? '0' : '') + String(end.getMonth() + 1) + '-' + (end.getDate() < 10 ? '0' : '') + String(end.getDate());
+
+                var url = 'https://api.nbrb.by/exrates/rates/dynamics/462?startDate=' + startDate + '&endDate=' + endDate;
+
+                function httpGet(url) {
+                    return new Promise(function(resolve, reject) {
+
+                        var dynamicsCourse = new XMLHttpRequest();
+                        dynamicsCourse.open('GET', url, true);
+
+                        dynamicsCourse.onload = function() {
+                            if (this.status == 200) {
+                                resolve(this.response);
+                            } else {
+                                var error = new Error(this.statusText);
+                                error.code = this.status;
+                                reject(error);
+                            }
+                        };
+
+                        dynamicsCourse.onerror = function() {
+                            reject(new Error("Network Error"));
+                        };
+
+                        dynamicsCourse.send();
+                    });
+
+                }
+
+                httpGet(url)
+                    .then(
+                        response => {
+                            var table = '<table><tr><th>10 CNY = ? BYN</th><th>Дата</th></tr>';
+                            var resp = JSON.parse(response);
+                            $.each(resp, function(key, value) {
+                                table += '<tr>';
+                                table += '<td>' + String(value['Cur_OfficialRate']) + '</td>';
+                                table += '<td>' + String(value['Date']).slice(0, -9) + '</td>';
+                                table += '</tr>';
+                                console.log(value['Cur_OfficialRate']);
+                            })
+                            table += '</table>';
+                            $('#tableCourse').html(table);
+                            console.log(table);
+                            //$.each(response, function(key, value) {
+                                //console.log(value['Date'])
+                            //})
+                        },
+                        error => alert(`Rejected: ${error}`)
+                    );
+            })
+        </script>
+    </body>
+</html>
