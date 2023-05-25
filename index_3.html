@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Задание 3</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+        <style>
+            #main {
+                margin-top: 5%;
+                margin-left: auto;
+                margin-right: auto;
+                width: 700px;
+            }
+
+            table {
+                font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+                text-align: center;
+                border-collapse: collapse;
+                border-spacing: 5px;
+                background: #E1E3E0;
+                border-radius: 20px;
+                margin: 50px auto;
+                margin-top: 0;
+            }
+            th {
+                font-size: 22px;
+                font-weight: 300;
+                padding: 12px 10px;
+                border-bottom: 2px solid #206cb3;
+                color: #206cb3;
+            }
+
+            td {
+                font-size: 20px;
+                padding: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="main">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Курс китайского юаня к чилийскому песо</th>
+                        <th>Курс китайского юаня к датской кроне</th>
+                    </tr>
+                </thead>
+                <tbody id="table">
+                    <tr>
+                        <td id="peso"></td>
+                        <td id="krona"></td>
+                    </tr>
+                </tbody>
+            </table>
+        <script>
+            "use strict";
+            // https://api.nbrb.by/exrates/rates/462
+            // https://api.nbrb.by/exrates/rates/374
+            // https://api.nbrb.by/exrates/rates/450
+
+            async function courseFetch() {
+                const yuan_response = await fetch('https://api.nbrb.by/exrates/rates/462');
+                const yuan_json = await yuan_response.json();
+                var yuan = yuan_json['Cur_OfficialRate'];
+
+                const peso_response = await fetch('https://api.nbrb.by/exrates/rates/374');
+                const peso_json = await peso_response.json();
+                var peso = peso_json['Cur_OfficialRate'];
+
+                const krona_response = await fetch('https://api.nbrb.by/exrates/rates/450');
+                const krona_json = await krona_response.json();
+                var krona = krona_json['Cur_OfficialRate'];
+
+                $('#peso').html((yuan / peso * 100).toFixed(3));
+                $('#krona').html((yuan / krona).toFixed(3));
+            }
+            
+            courseFetch();
+        </script>
+    </body>
+</html>
